@@ -3,3 +3,10 @@ LPW/
 runs/
 __pycache__/
 *.pt
+dataset/
+LPW/
+runs/
+__pycache__/
+*.pt
+*.zip
+venv/
