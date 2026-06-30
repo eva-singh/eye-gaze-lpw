@@ -114,4 +114,4 @@ for epoch in range(num_epochs):
 
         total_loss += loss.item()
 
-    print(f" Epoch {epoch+1}, Loss: {total_loss:.4f}")
+print(f" Epoch {epoch+1}, Loss: {total_loss:.4f}")

@@ -4,11 +4,12 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-
 from models.frcnn import get_model
 
 torch.backends.cudnn.benchmark = True
 
+
+# ── Dataset ────────────────────────────────────────────────────────────────────
 
 class GazeDataset(Dataset):
 
@@ -88,9 +89,13 @@ class GazeDataset(Dataset):
         return img_tensor, target
 
 
+# ── Collate (handles variable-size targets) ────────────────────────────────────
+
 def collate_fn(batch):
     return tuple(zip(*batch))
 
+
+# ── Training Loop ──────────────────────────────────────────────────────────────
 
 def train():
 
@@ -204,7 +209,7 @@ def train():
             if (batch_idx + 1) % 100 == 0:
 
                 print(
-                    f"Epoch [{epoch+1}/{NUM_EPOCHS}] "
+                    f"  Epoch [{epoch+1}/{NUM_EPOCHS}] "
                     f"Batch [{batch_idx+1}/{len(loader)}] "
                     f"Loss: {losses.item():.4f}"
                 )
@@ -221,6 +226,11 @@ def train():
             f"Time: {elapsed:.1f}s\n"
         )
 
+        ckpt_path = os.path.join(
+            OUTPUT_DIR,
+            f"frcnn_epoch{epoch+1}.pth"
+        )
+
         torch.save(
             {
                 "epoch": epoch + 1,
@@ -228,21 +238,22 @@ def train():
                 "optimizer": optimizer.state_dict(),
                 "loss": avg_loss
             },
-            os.path.join(
-                OUTPUT_DIR,
-                f"frcnn_epoch{epoch+1}.pth"
-            )
+            ckpt_path
         )
+
+        print(f"Saved checkpoint → {ckpt_path}")
+
+    final_path = os.path.join(
+        OUTPUT_DIR,
+        "frcnn_final.pth"
+    )
 
     torch.save(
         model.state_dict(),
-        os.path.join(
-            OUTPUT_DIR,
-            "frcnn_final.pth"
-        )
+        final_path
     )
 
-    print("Training complete")
+    print(f"\nTraining complete. Final model → {final_path}")
 
 
 if __name__ == "__main__":
